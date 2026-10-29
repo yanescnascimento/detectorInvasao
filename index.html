@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Central de Segurança IoT</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>🛡️ Central de Segurança IoT</h1>
+    <div class="pills">
+      <span id="pillConexao" class="pill">Firebase: ...</span>
+      <span id="pillSistema" class="pill">Sistema: ...</span>
+      <span id="pillOcorrencias" class="pill">Ocorrências: 0</span>
+      <button id="btnMusica">🎵 Escolher música</button>
+      <input id="inputMusica" type="file" accept="audio/*" hidden>
+      <button id="btnSom">🔇 Som desligado</button>
+      <button id="btnTeste">Testar alarme</button>
+    </div>
+  </header>
+
+  <div id="banner" class="banner">Aguardando dados...</div>
+
+  <main>
+    <svg id="planta" viewBox="0 0 900 540" xmlns="http://www.w3.org/2000/svg"></svg>
+
+    <aside>
+      <h2>Últimos eventos</h2>
+      <ul id="eventos"><li class="vazio">Sem eventos</li></ul>
+    </aside>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

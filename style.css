@@ -1,0 +1,80 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0; min-height: 100vh;
+  background: #0f1720; color: #e6edf3;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+header {
+  display: flex; flex-wrap: wrap; gap: 12px;
+  align-items: center; justify-content: space-between;
+  padding: 14px 20px; background: #16212e; border-bottom: 1px solid #263445;
+}
+h1 { font-size: 20px; margin: 0; }
+h2 { font-size: 15px; margin: 0 0 10px; color: #9fb3c8; }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pill { padding: 5px 12px; border-radius: 999px; background: #223246; font-size: 13px; }
+.pill.ok { background: #14532d; }
+.pill.erro { background: #7f1d1d; }
+.pill.armado { background: #92400e; }
+button {
+  background: #2b3f57; color: #e6edf3; border: 0; border-radius: 8px;
+  padding: 7px 12px; cursor: pointer; font-size: 13px;
+}
+button:hover { background: #36506f; }
+
+.banner {
+  margin: 14px 20px 0; padding: 14px 18px; border-radius: 10px;
+  background: #1c2a3a; font-weight: 600; font-size: 18px; text-align: center;
+}
+.banner.armado { background: #3b2a0a; color: #fbbf24; }
+
+main {
+  display: grid; grid-template-columns: 1fr 280px; gap: 16px; padding: 16px 20px;
+}
+@media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+#planta { width: 100%; background: #121c27; border-radius: 12px; border: 1px solid #263445; }
+aside { background: #16212e; border-radius: 12px; padding: 14px; border: 1px solid #263445; }
+#eventos { list-style: none; margin: 0; padding: 0; font-size: 13px; }
+#eventos li { padding: 8px 0; border-bottom: 1px solid #263445; }
+#eventos li.vazio { color: #6b7f94; }
+#eventos .tag { font-weight: 700; }
+#eventos .INTRUSAO { color: #f87171; }
+#eventos .ARMADO { color: #fbbf24; }
+#eventos .DESARMADO { color: #4ade80; }
+#eventos small { display: block; color: #8aa0b6; }
+
+/* ---------- Planta ---------- */
+.room rect { fill: #1a2837; stroke: #4b6178; stroke-width: 3; transition: fill .2s, stroke .2s; }
+.room text.nome { fill: #cbd5e1; font-size: 22px; font-weight: 600; text-anchor: middle; }
+.room text.pir { fill: #8aa0b6; font-size: 13px; text-anchor: middle; }
+.room .sensor-dot { fill: #22c55e; transition: fill .2s; }
+.room .ring { fill: none; stroke: #22c55e; stroke-width: 2; opacity: .5; }
+.decor rect { fill: #162231; stroke: #2f4257; stroke-width: 2; stroke-dasharray: 8 6; }
+.decor text { fill: #4d6176; font-size: 18px; text-anchor: middle; }
+.porta { stroke: #121c27; stroke-width: 8; }
+
+.room.mov rect { fill: #3a2f10; stroke: #f59e0b; }
+.room.mov .sensor-dot { fill: #f59e0b; }
+.room.mov .ring { stroke: #f59e0b; animation: ping 1.2s infinite; }
+
+.room.alarm rect { fill: #5a1414; stroke: #ef4444; stroke-width: 5; animation: roomBlink .5s infinite alternate; }
+.room.alarm .sensor-dot { fill: #ef4444; }
+.room.alarm .ring { stroke: #ef4444; animation: ping .8s infinite; }
+.room.alarm text.nome { fill: #fff; }
+
+@keyframes ping { from { r: 10; opacity: .9; } to { r: 55; opacity: 0; } }
+@keyframes roomBlink { from { fill: #5a1414; } to { fill: #b91c1c; } }
+
+/* ---------- Tela inteira piscando ---------- */
+body.alarm::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 50;
+  box-shadow: inset 0 0 120px 40px rgba(239, 68, 68, .9);
+  background: rgba(239, 68, 68, .25);
+  animation: screenBlink .6s infinite alternate;
+}
+body.alarm .banner {
+  background: #dc2626; color: #fff; font-size: 24px;
+  animation: bannerBlink .5s infinite alternate;
+}
+@keyframes screenBlink { from { opacity: .15; } to { opacity: 1; } }
+@keyframes bannerBlink { from { background: #991b1b; } to { background: #ef4444; } }

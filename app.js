@@ -139,72 +139,12 @@ async function tick() {
   }
 }
 
-// ================== SOM DO ALARME (música + grave estourado) ==================
-let musicaBuffer = null, musicaSrc = null, entradaAudio = null;
-
-function iniciarAudio() {
-  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === "suspended") audioCtx.resume();
-  if (!entradaAudio) entradaAudio = montarCadeia();
-}
-
-function curvaDistorcao(k) {
-  const n = 44100, c = new Float32Array(n);
-  for (let i = 0; i < n; i++) {
-    const x = (i * 2) / n - 1;
-    c[i] = ((3 + k) * x * 20 * Math.PI / 180) / (Math.PI + k * Math.abs(x));
-  }
-  return c;
-}
-
-// Cadeia: grave pesado -> punch -> drive -> distorção (caixa estourada) -> compressor -> volume
-function montarCadeia() {
-  const sub = audioCtx.createBiquadFilter();
-  sub.type = "lowshelf"; sub.frequency.value = 90; sub.gain.value = 20;
-
-  const punch = audioCtx.createBiquadFilter();
-  punch.type = "peaking"; punch.frequency.value = 140; punch.Q.value = 1; punch.gain.value = 8;
-
-  const drive = audioCtx.createGain(); drive.gain.value = 2.5;
-
-  const dist = audioCtx.createWaveShaper();
-  dist.curve = curvaDistorcao(40); dist.oversample = "4x";
-
-  const comp = audioCtx.createDynamicsCompressor();
-  comp.threshold.value = -30; comp.ratio.value = 12;
-
-  const vol = audioCtx.createGain(); vol.gain.value = 0.9;
-
-  sub.connect(punch); punch.connect(drive); drive.connect(dist);
-  dist.connect(comp); comp.connect(vol); vol.connect(audioCtx.destination);
-  return sub;
-}
-
-async function carregarArquivo(file) {
-  iniciarAudio();
-  musicaBuffer = await audioCtx.decodeAudioData(await file.arrayBuffer());
-  $("btnMusica").textContent = "🎵 " + file.name;
-}
-
-// tenta carregar "alarme.mp3" da mesma pasta (funciona quando o site está hospedado)
-async function tentarArquivoPadrao() {
-  if (musicaBuffer) return;
-  try {
-    const r = await fetch("alarme.mp3");
-    if (!r.ok) return;
-    musicaBuffer = await audioCtx.decodeAudioData(await r.arrayBuffer());
-    $("btnMusica").textContent = "🎵 alarme.mp3";
-  } catch (e) { /* sem arquivo: usa o bipe */ }
-}
-
-$("btnMusica").onclick = () => $("inputMusica").click();
-$("inputMusica").onchange = e => { if (e.target.files[0]) carregarArquivo(e.target.files[0]); };
-
-$("btnSom").onclick = async () => {
+// ================== SOM DO ALARME ==================
+$("btnSom").onclick = () => {
   somLigado = !somLigado;
+  if (somLigado && !audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   $("btnSom").textContent = somLigado ? "🔊 Som ligado" : "🔇 Som desligado";
-  if (somLigado) { iniciarAudio(); await tentarArquivoPadrao(); }
-  else atualizarSom(false);
+  if (!somLigado) atualizarSom(false);
 };
 
 function beep() {
@@ -215,31 +155,9 @@ function beep() {
   o.start(); o.stop(audioCtx.currentTime + 0.18);
 }
 
-function tocarMusica() {
-  if (musicaSrc) return;
-  const src = audioCtx.createBufferSource();
-  src.buffer = musicaBuffer; src.loop = true;
-  src.connect(entradaAudio); src.start();
-  musicaSrc = src;
-}
-
-function pararMusica() {
-  if (!musicaSrc) return;
-  try { musicaSrc.stop(); } catch (e) {}
-  musicaSrc.disconnect(); musicaSrc = null;
-}
-
 function atualizarSom(alarme) {
-  const tocar = alarme && somLigado && audioCtx;
-  if (tocar && musicaBuffer) {
-    if (beepTimer) { clearInterval(beepTimer); beepTimer = null; }
-    tocarMusica();
-  } else if (tocar) {
-    if (!beepTimer) beepTimer = setInterval(beep, 450);   // sem música: bipe
-  } else {
-    pararMusica();
-    if (beepTimer) { clearInterval(beepTimer); beepTimer = null; }
-  }
+  if (alarme && somLigado && !beepTimer) beepTimer = setInterval(beep, 450);
+  if ((!alarme || !somLigado) && beepTimer) { clearInterval(beepTimer); beepTimer = null; }
 }
 
 // ================== TESTE LOCAL ==================
